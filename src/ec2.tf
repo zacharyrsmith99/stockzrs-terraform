@@ -8,14 +8,11 @@ resource "aws_instance" "ec2_stockzrs_relay" {
               #!/bin/bash
               set -e
 
-              # Update and install dependencies
               yum update -y
               yum install -y git nodejs npm amazon-cloudwatch-agent
 
-              # Install PM2 globally
               npm install -g pm2
 
-              # Clone your repository
               git clone https://github.com/zacharyrsmith99/stockzrs-relay-service.git /home/ec2-user/stockzrs-relay-service
               chown -R ec2-user:ec2-user /home/ec2-user/stockzrs-relay-service
 
@@ -42,13 +39,10 @@ resource "aws_instance" "ec2_stockzrs_relay" {
               }
               EOT
 
-              # Start CloudWatch Agent
               /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
 
-              # Enable CloudWatch Agent to start on boot
               systemctl enable amazon-cloudwatch-agent
 
-              # Switch to ec2-user and set up the application
               su - ec2-user << 'EOSU'
               cd /home/ec2-user/stockzrs-relay-service
               npm install
