@@ -8,11 +8,11 @@ resource "aws_secretsmanager_secret_version" "stockzrs_relay_config" {
     NODE_ENV                 = "production"
     LOG_LEVEL                = "info"
     ENVIRONMENT              = "production"
-    PORT                     = tostring(var.stockzrs_port)
-    TWELVEDATA_API_KEY       = ""
-    TWELVEDATA_WS_URL        = ""
-    COINBASE_WS_URL          = ""
-    COINBASE_API_KEY         = ""
-    COINBASE_API_PRIVATE_KEY = ""
+    PORT                     = tostring(var.stockzrs_relay_port)
+    TWELVEDATA_API_KEY       = var.twelvedata_api_key
+    TWELVEDATA_WS_URL        = "wss://ws.twelvedata.com/v1/quotes/price"
+    COINBASE_WS_URL          = "wss://advanced-trade-ws.coinbase.com"
+    COINBASE_API_KEY         = var.coinbase_api_key
+    COINBASE_API_PRIVATE_KEY = var.coinbase_api_private_key
   })
 }
