@@ -13,7 +13,10 @@ resource "aws_iam_role" "github_actions" {
         }
         Condition = {
           StringLike = {
-            "token.actions.githubusercontent.com:sub" : "repo:zacharyrsmith99/stockzrs-relay-service:*"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:zacharyrsmith99/stockzrs-relay-service:*",
+              "repo:zacharyrsmith99/stockzrs-frontend:*"
+            ]
           }
         }
       }
@@ -88,7 +91,7 @@ resource "aws_iam_role_policy_attachment" "github_actions_ecr" {
 }
 
 resource "aws_eks_access_entry" "github_actions" {
-  cluster_name      = aws_eks_cluster.eks.name
+  cluster_name      = module.eks.stockzrs_cluster_name
   principal_arn     = aws_iam_role.github_actions.arn
   kubernetes_groups = ["github-actions"]
 }
@@ -99,51 +102,90 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
-
-resource "github_actions_secret" "aws_account_id" {
-  repository      = var.stockzrs_relay_github_repository
-  secret_name     = "AWS_ACCOUNT_ID"
-  plaintext_value = data.aws_caller_identity.current.account_id
-}
+####################################
+#################################### SHARED GITHUB SECRETS
 
 resource "github_actions_secret" "aws_region" {
-  repository      = var.stockzrs_relay_github_repository
+  count           = length(var.github_repositories_with_common_secrets)
+  repository      = var.github_repositories_with_common_secrets[count.index]
   secret_name     = "AWS_REGION"
   plaintext_value = var.aws_region
 }
 
+resource "github_actions_secret" "aws_stockzrs_kubernetes_cluster_name" {
+  count           = length(var.github_repositories_with_common_secrets)
+  repository      = var.github_repositories_with_common_secrets[count.index]
+  secret_name     = "AWS_STOCKZRS_KUBERNETES_CLUSTER_NAME"
+  plaintext_value = module.eks.stockzrs_cluster_name
+}
+
+resource "github_actions_secret" "aws_gha_role_arn" {
+  count           = length(var.github_repositories_with_common_secrets)
+  repository      = var.github_repositories_with_common_secrets[count.index]
+  secret_name     = "AWS_GHA_ROLE_ARN"
+  plaintext_value = aws_iam_role.github_actions.arn
+}
+
+
 resource "github_actions_secret" "ec2_user_name" {
-  repository      = var.stockzrs_relay_github_repository
+  count           = length(var.github_repositories_with_common_secrets)
+  repository      = var.github_repositories_with_common_secrets[count.index]
   secret_name     = "EC2_USER_NAME"
   plaintext_value = "ec2-user"
 }
 
-resource "github_actions_secret" "ecr_repository_name" {
+resource "github_actions_secret" "aws_account_id" {
+  count           = length(var.github_repositories_with_common_secrets)
+  repository      = var.github_repositories_with_common_secrets[count.index]
+  secret_name     = "AWS_ACCOUNT_ID"
+  plaintext_value = data.aws_caller_identity.current.account_id
+}
+
+####################################
+####################################
+
+####################################
+####################################STOCKZRS RELAY SERVICE GITHUB SECRETS
+
+resource "github_actions_secret" "stockzrs_relay_service_ecr_repository_name" {
   repository      = var.stockzrs_relay_github_repository
   secret_name     = "ECR_REPOSITORY_NAME"
-  plaintext_value = aws_ecr_repository.stockzrs_relay_repository.name
+  plaintext_value = module.services.ecr_repositories.stockzrs_relay.name
 }
 
-resource "github_actions_secret" "ecr_repository_url" {
+resource "github_actions_secret" "stockzrs_relay_service_ecr_repository_url" {
   repository      = var.stockzrs_relay_github_repository
   secret_name     = "ECR_REPOSITORY_URL"
-  plaintext_value = aws_ecr_repository.stockzrs_relay_repository.repository_url
+  plaintext_value = module.services.ecr_repositories.stockzrs_relay.url
 }
 
-resource "github_actions_secret" "STOCKZRS_RELAY_PORT" {
+resource "github_actions_secret" "stockzrs_relay_service_port" {
   repository      = var.stockzrs_relay_github_repository
   secret_name     = "STOCKZRS_RELAY_PORT"
   plaintext_value = var.stockzrs_relay_port
 }
 
-resource "github_actions_secret" "AWS_STOCKZRS_KUBERNETES_CLUSTER_NAME" {
-  repository      = var.stockzrs_relay_github_repository
-  secret_name     = "AWS_STOCKZRS_KUBERNETES_CLUSTER_NAME"
-  plaintext_value = aws_eks_cluster.eks.name
+####################################
+####################################
+
+####################################
+####################################STOCKZRS FRONTEND GITHUB SECRETS
+
+resource "github_actions_secret" "stockzrs_frontend_port" {
+  repository      = var.stockzrs_frontend_github_repository
+  secret_name     = "STOCKZRS_FRONTEND_PORT"
+  plaintext_value = var.stockzrs_frontend_port
 }
 
-resource "github_actions_secret" "aws_gha_role_arn" {
-  repository      = var.stockzrs_relay_github_repository
-  secret_name     = "AWS_GHA_ROLE_ARN"
-  plaintext_value = aws_iam_role.github_actions.arn
+resource "github_actions_secret" "stockzrs_frontend_ecr_repository_name" {
+  repository      = var.stockzrs_frontend_github_repository
+  secret_name     = "ECR_REPOSITORY_NAME"
+  plaintext_value = module.services.ecr_repositories.stockzrs_frontend.name
 }
+resource "github_actions_secret" "stockzrs_frontend_ecr_repository_url" {
+  repository      = var.stockzrs_frontend_github_repository
+  secret_name     = "ECR_REPOSITORY_URL"
+  plaintext_value = module.services.ecr_repositories.stockzrs_frontend.url
+}
+
+

@@ -26,17 +26,54 @@ resource "aws_iam_policy" "secrets_manager_access" {
         Action = [
           "secretsmanager:GetSecretValue",
         ]
-        Effect   = "Allow"
-        Resource = aws_secretsmanager_secret.stockzrs_relay_config.arn
+        Effect = "Allow"
+        Resource = [
+          var.stockzrs_secrets_configs.stockzrs_relay.arn,
+          var.stockzrs_secrets_configs.stockzrs_frontend.arn,
+        ]
       }
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "secrets_manager_access" {
-  policy_arn = aws_iam_policy.secrets_manager_access.arn
+resource "aws_iam_policy" "route53_cert_manager" {
+  name        = "route53_cert_manager_policy"
+  path        = "/"
+  description = "Policy for Route 53 cert-manager"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "route53:GetChange",
+          "route53:ChangeResourceRecordSets",
+          "route53:ListResourceRecordSets"
+        ]
+        Resource = [
+          "arn:aws:route53:::hostedzone/*",
+          "arn:aws:route53:::change/*"
+        ]
+      },
+      {
+        Effect   = "Allow"
+        Action   = "route53:ListHostedZonesByName"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "route53_cert_manager" {
+  policy_arn = aws_iam_policy.route53_cert_manager.arn
   role       = aws_iam_role.nodes_general.name
 }
+
+# resource "aws_iam_role_policy_attachment" "secrets_manager_access" {
+#   policy_arn = aws_iam_policy.secrets_manager_access.arn
+#   role       = aws_iam_role.nodes_general.name
+# }
 
 resource "aws_iam_role_policy_attachment" "amazon_eks_worker_node_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
@@ -56,13 +93,13 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_on
 
 resource "aws_eks_node_group" "general" {
   cluster_name    = aws_eks_cluster.eks.name
-  version         = "1.29"
+  version         = "1.30"
   node_group_name = "general"
   node_role_arn   = aws_iam_role.nodes_general.arn
 
   subnet_ids = [
-    aws_subnet.private_1.id,
-    aws_subnet.private_2.id
+    var.stockzrs_subnets.private[0].id,
+    var.stockzrs_subnets.private[1].id
   ]
 
   capacity_type  = "ON_DEMAND"
@@ -89,8 +126,10 @@ resource "aws_eks_node_group" "general" {
   }
 
   depends_on = [
+    aws_eks_cluster.eks,
     aws_iam_role_policy_attachment.amazon_eks_cni_policy,
     aws_iam_role_policy_attachment.amazon_ec2_container_registry_read_only,
-    aws_iam_role_policy_attachment.amazon_eks_worker_node_policy
+    aws_iam_role_policy_attachment.amazon_eks_worker_node_policy,
+    aws_iam_role_policy_attachment.route53_cert_manager
   ]
 }

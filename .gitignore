@@ -6,3 +6,7 @@ terraform.tfstate.backup
 .terraform.lock.hcl
 config
 terraform.tfvars
+kubeconfig-eks
+config.ps1
+*.ovpn
+*.backup

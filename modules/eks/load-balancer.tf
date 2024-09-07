@@ -53,6 +53,11 @@ resource "helm_release" "aws_lbc" {
   }
 
   set {
+    name  = "vpcId"
+    value = var.stockzrs_vpcs.main.id
+  }
+
+  set {
     name  = "serviceAccount.name"
     value = "aws-load-balancer-controller"
   }

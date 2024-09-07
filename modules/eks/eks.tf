@@ -25,14 +25,14 @@ resource "aws_eks_cluster" "eks" {
 
   name     = "eks"
   role_arn = aws_iam_role.eks_cluster.arn
-  version  = "1.29"
+  version  = "1.30"
 
   vpc_config {
     endpoint_private_access = false
     endpoint_public_access  = true
     subnet_ids = [
-      aws_subnet.private_1.id,
-      aws_subnet.private_2.id
+      var.stockzrs_subnets.private[0].id,
+      var.stockzrs_subnets.private[1].id
     ]
   }
 
@@ -40,26 +40,4 @@ resource "aws_eks_cluster" "eks" {
     authentication_mode                         = "API"
     bootstrap_cluster_creator_admin_permissions = true
   }
-}
-
-resource "kubernetes_namespace" "stockzrs_relay_service" {
-  metadata {
-    name = "stockzrs-relay-service"
-    labels = {
-      name        = "stockzrs-relay-service"
-      environment = "production"
-    }
-  }
-}
-
-resource "kubernetes_manifest" "github_actions_cluster_role" {
-  manifest = yamldecode(file("${path.module}/k8s/cluster-roles/github-actions-cluster-role.yaml"))
-
-  depends_on = [aws_eks_cluster.eks]
-}
-
-resource "kubernetes_manifest" "github_actions_cluster_role_binding" {
-  manifest = yamldecode(file("${path.module}/k8s/cluster-roles/github-actions-cluster-role-binding.yaml"))
-
-  depends_on = [kubernetes_manifest.github_actions_cluster_role]
 }
