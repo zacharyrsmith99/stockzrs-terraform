@@ -60,6 +60,6 @@ variable "coinbase_api_private_key" {
 }
 
 variable "ingress_nginx_lb_hosted_zone_id" {
-  type = string
+  type      = string
   sensitive = true
 }

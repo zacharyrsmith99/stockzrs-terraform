@@ -10,7 +10,7 @@ resource "aws_route53_record" "apex" {
 
   alias {
     name                   = var.ingress_nginx_lb_hostname
-    zone_id                = "Z26RNL4JYFTOTI"
+    zone_id                = var.ingress_nginx_lb_hosted_zone_id
     evaluate_target_health = true
   }
 }
@@ -22,7 +22,7 @@ resource "aws_route53_record" "frontend" {
 
   alias {
     name                   = var.ingress_nginx_lb_hostname
-    zone_id                = "Z26RNL4JYFTOTI"
+    zone_id                = var.ingress_nginx_lb_hosted_zone_id
     evaluate_target_health = true
   }
 }
@@ -34,7 +34,7 @@ resource "aws_route53_record" "stockzrs_relay_service_record" {
 
   alias {
     name                   = var.ingress_nginx_lb_hostname
-    zone_id                = "Z26RNL4JYFTOTI"
+    zone_id                = var.ingress_nginx_lb_hosted_zone_id
     evaluate_target_health = true
   }
 }
