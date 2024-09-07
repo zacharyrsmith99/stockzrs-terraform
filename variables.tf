@@ -1,11 +1,3 @@
-variable "region" {
-  default = "us-east-1"
-}
-
-variable "instance_type" {
-  default = "t4g.micro"
-}
-
 variable "stockzrs_relay_github_repository" {
   default = "stockzrs-relay-service"
 }

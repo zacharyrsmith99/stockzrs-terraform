@@ -1,6 +1,6 @@
 resource "aws_db_subnet_group" "stockzrs_db" {
   name       = "stockzrs-db-subnet-group"
-  subnet_ids = [aws_subnet.private_1.id, aws_subnet.private_2.id]
+  subnet_ids = [var.stockzrs_subnets.rds_private[0].id, var.stockzrs_subnets.rds_private[1].id]
 
   tags = {
     Name = "stockzrs_db subnet group"
@@ -10,14 +10,14 @@ resource "aws_db_subnet_group" "stockzrs_db" {
 resource "aws_security_group" "postgres_sg" {
   name        = "stockzrs-db-security-group"
   description = "Security group for stockzrs_db RDS"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.stockzrs_vpcs.main.id
 
   ingress {
     description = "stockzrs_db access from VPC"
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = [var.stockzrs_vpcs.main.cidr_block]
   }
 
   egress {
@@ -32,6 +32,12 @@ resource "aws_security_group" "postgres_sg" {
   }
 }
 
+
+resource "random_password" "stockzrs_postgres_db_password" {
+  length  = 16
+  special = false
+}
+
 resource "aws_db_instance" "stockzrs_db" {
   identifier             = "stockzrs-postgres"
   instance_class         = "db.t3.micro"
@@ -39,9 +45,9 @@ resource "aws_db_instance" "stockzrs_db" {
   engine                 = "postgres"
   engine_version         = "16.4"
   username               = "postgres"
-  password               = var.stockzrs_db_password
+  password               = random_password.stockzrs_postgres_db_password.result
   db_name                = "stockzrs"
-  db_subnet_group_name   = aws_db_subnet_group.postgres.name
+  db_subnet_group_name   = aws_db_subnet_group.stockzrs_db.name
   vpc_security_group_ids = [aws_security_group.postgres_sg.id]
   publicly_accessible    = false
   skip_final_snapshot    = true

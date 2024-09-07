@@ -24,5 +24,11 @@ module "vpn" {
   source           = "./modules/vpn"
   stockzrs_vpcs    = module.networking.stockzrs_vpcs
   stockzrs_subnets = module.networking.stockzrs_subnets
-  aws_region = var.region
+  aws_region       = var.aws_region
+}
+
+module "rds" {
+  source                        = "./modules/rds"
+  stockzrs_subnets              = module.networking.stockzrs_subnets
+  stockzrs_vpcs                 = module.networking.stockzrs_vpcs
 }
