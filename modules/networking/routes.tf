@@ -54,3 +54,8 @@ resource "aws_route_table_association" "public_zone2" {
   route_table_id = aws_route_table.public.id
 }
 
+resource "aws_route" "private_vpn" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "172.27.224.0/20"
+  network_interface_id               = var.openvpn_eni_id
+}

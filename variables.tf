@@ -31,11 +31,6 @@ variable "github_token" {
   sensitive = true
 }
 
-variable "cidr_blocks_ssh" {
-  type      = string
-  sensitive = true
-}
-
 variable "twelvedata_api_key" {
   type      = string
   sensitive = true
@@ -54,4 +49,8 @@ variable "coinbase_api_private_key" {
 variable "ingress_nginx_lb_hosted_zone_id" {
   type      = string
   sensitive = true
+}
+
+variable "ssh_connect_cidr_block" {
+  type = string
 }
