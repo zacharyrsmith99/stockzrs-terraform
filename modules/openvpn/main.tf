@@ -87,10 +87,10 @@ resource "aws_iam_instance_profile" "ec2_instance_connect" {
 }
 
 resource "aws_security_group_rule" "allow_ssh" {
-  type        = "ingress"
-  from_port   = 22
-  to_port     = 22
-  protocol    = "tcp"
-  cidr_blocks = [var.ssh_connect_cidr_block]
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [var.ssh_connect_cidr_block]
   security_group_id = aws_security_group.openvpn.id
 }

@@ -22,6 +22,10 @@ output "stockzrs_secrets_configs" {
       arn           = aws_secretsmanager_secret.stockzrs_frontend_config.arn
       secret_string = jsondecode(aws_secretsmanager_secret_version.stockzrs_frontend_config.secret_string)
     }
+    stockzrs_kafka = {
+      arn           = aws_secretsmanager_secret.stockzrs_kafka_config.arn
+      secret_string = jsondecode(aws_secretsmanager_secret_version.stockzrs_kafka_config.secret_string)
+    }
   }
   sensitive = true
 }

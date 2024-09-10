@@ -17,8 +17,9 @@ variable "stockzrs_relay_service_ws_url" {
   default = "wss://stockzrs-relay-service.stockzrs.com"
 }
 
-variable "stockzrs_frontend_port" {
-}
+variable "stockzrs_frontend_port" {}
 
-variable "stockzrs_relay_port" {
-}
+variable "stockzrs_relay_port" {}
+
+variable "kafka_bootstrap_server" {}
+

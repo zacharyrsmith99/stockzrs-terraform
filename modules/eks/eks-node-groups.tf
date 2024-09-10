@@ -70,11 +70,6 @@ resource "aws_iam_role_policy_attachment" "route53_cert_manager" {
   role       = aws_iam_role.nodes_general.name
 }
 
-# resource "aws_iam_role_policy_attachment" "secrets_manager_access" {
-#   policy_arn = aws_iam_policy.secrets_manager_access.arn
-#   role       = aws_iam_role.nodes_general.name
-# }
-
 resource "aws_iam_role_policy_attachment" "amazon_eks_worker_node_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.nodes_general.name
@@ -123,6 +118,40 @@ resource "aws_eks_node_group" "general" {
     ignore_changes = [
       scaling_config[0].desired_size
     ]
+  }
+
+  depends_on = [
+    aws_eks_cluster.eks,
+    aws_iam_role_policy_attachment.amazon_eks_cni_policy,
+    aws_iam_role_policy_attachment.amazon_ec2_container_registry_read_only,
+    aws_iam_role_policy_attachment.amazon_eks_worker_node_policy,
+    aws_iam_role_policy_attachment.route53_cert_manager
+  ]
+}
+
+resource "aws_eks_node_group" "kafka" {
+  cluster_name    = aws_eks_cluster.eks.name
+  node_group_name = "kafka"
+  node_role_arn   = aws_iam_role.nodes_general.arn
+
+  subnet_ids = [
+    var.stockzrs_subnets.private[0].id,
+    var.stockzrs_subnets.private[1].id
+  ]
+
+  instance_types = ["t3.small"]
+  scaling_config {
+    desired_size = 3
+    max_size     = 3
+    min_size     = 2
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+
+  labels = {
+    role = "kafka"
   }
 
   depends_on = [
