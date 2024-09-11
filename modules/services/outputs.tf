@@ -8,6 +8,10 @@ output "ecr_repositories" {
       name = aws_ecr_repository.stockzrs_frontend_repository.name
       url  = aws_ecr_repository.stockzrs_frontend_repository.repository_url
     }
+    stockzrs_financial_aggregator_service = {
+      name = aws_ecr_repository.stockzrs_financial_aggregator_service_repository.name
+      url  = aws_ecr_repository.stockzrs_financial_aggregator_service_repository.repository_url
+    }
   }
   description = "ECR repository details for Stockzrs services"
 }
@@ -25,6 +29,10 @@ output "stockzrs_secrets_configs" {
     stockzrs_kafka = {
       arn           = aws_secretsmanager_secret.stockzrs_kafka_config.arn
       secret_string = jsondecode(aws_secretsmanager_secret_version.stockzrs_kafka_config.secret_string)
+    }
+    stockzrs_financial_aggregator_service = {
+      arn           = aws_secretsmanager_secret.stockzrs_financial_aggregator_service_config.arn
+      secret_string = jsondecode(aws_secretsmanager_secret_version.stockzrs_financial_aggregator_service_config.secret_string)
     }
   }
   sensitive = true

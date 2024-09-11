@@ -15,7 +15,8 @@ resource "aws_iam_role" "github_actions" {
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
               "repo:zacharyrsmith99/stockzrs-relay-service:*",
-              "repo:zacharyrsmith99/stockzrs-frontend:*"
+              "repo:zacharyrsmith99/stockzrs-frontend:*",
+              "repo:zacharyrsmith99/stockzrs-financial-aggregator-service:*"
             ]
           }
         }
@@ -188,4 +189,22 @@ resource "github_actions_secret" "stockzrs_frontend_ecr_repository_url" {
   plaintext_value = module.services.ecr_repositories.stockzrs_frontend.url
 }
 
+####################################
+####################################
 
+####################################
+####################################STOCKZRS FINANCIAL AGGREGATOR SERVICE GITHUB SECRETS
+
+resource "github_actions_secret" "stockzrs_financial_aggregator_service_ecr_repository_name" {
+  repository      = var.stockzrs_financial_aggregator_service_github_repository
+  secret_name     = "ECR_REPOSITORY_NAME"
+  plaintext_value = module.services.ecr_repositories.stockzrs_financial_aggregator_service.name
+}
+resource "github_actions_secret" "stockzrs_financial_aggregator_service_ecr_repository_url" {
+  repository      = var.stockzrs_financial_aggregator_service_github_repository
+  secret_name     = "ECR_REPOSITORY_URL"
+  plaintext_value = module.services.ecr_repositories.stockzrs_financial_aggregator_service.url
+}
+
+####################################
+####################################

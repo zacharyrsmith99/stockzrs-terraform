@@ -43,3 +43,14 @@ resource "aws_secretsmanager_secret_version" "stockzrs_kafka_config" {
     KAFKA_BROKER_URL = var.kafka_bootstrap_server
   })
 }
+
+resource "aws_secretsmanager_secret" "stockzrs_financial_aggregator_service_config" {
+  name = "stockzrs-financial-aggregator-service-secrets"
+}
+
+resource "aws_secretsmanager_secret_version" "stockzrs_financial_aggregator_service_config" {
+  secret_id = aws_secretsmanager_secret.stockzrs_financial_aggregator_service_config.id
+  secret_string = jsonencode({
+    KAFKA_BROKER_URL = var.kafka_bootstrap_server
+  })
+}

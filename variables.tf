@@ -6,10 +6,14 @@ variable "stockzrs_frontend_github_repository" {
   default = "stockzrs-frontend"
 }
 
+variable "stockzrs_financial_aggregator_service_github_repository" {
+  default = "stockzrs-financial-aggregator-service"
+}
+
 variable "github_repositories_with_common_secrets" {
   type        = list(string)
   description = "List of GitHub repositories to set secrets for"
-  default     = ["stockzrs-relay-service", "stockzrs-frontend"]
+  default     = ["stockzrs-relay-service", "stockzrs-frontend", "stockzrs-financial-aggregator-service"]
 }
 
 variable "stockzrs_frontend_port" {

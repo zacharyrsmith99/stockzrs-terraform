@@ -25,7 +25,7 @@ resource "kubernetes_manifest" "kafka_cluster" {
     spec = {
       kafka = {
         version  = "3.8.0"
-        replicas = 2
+        replicas = 3
         listeners = [
           {
             name = "plain"
@@ -41,11 +41,11 @@ resource "kubernetes_manifest" "kafka_cluster" {
           }
         ]
         config = {
-          "offsets.topic.replication.factor"         = 2
-          "transaction.state.log.replication.factor" = 2
-          "transaction.state.log.min.isr"            = 2
-          "default.replication.factor"               = 2
-          "min.insync.replicas"                      = 2
+          "offsets.topic.replication.factor"         = 3
+          "transaction.state.log.replication.factor" = 3
+          "transaction.state.log.min.isr"            = 3
+          "default.replication.factor"               = 3
+          "min.insync.replicas"                      = 3
         }
         storage = {
           type = "jbod"
@@ -55,37 +55,37 @@ resource "kubernetes_manifest" "kafka_cluster" {
               type        = "persistent-claim"
               size        = "20Gi"
               deleteClaim = false
-              class       = "gp2"
+              class       = "ebs-sc"
             }
           ]
         }
         resources = {
           requests = {
-            memory = "1Gi"
-            cpu    = "500m"
+            memory = "768Mi"
+            cpu    = "400m"
           }
           limits = {
-            memory = "2Gi"
-            cpu    = "1"
+            memory = "1536Mi"
+            cpu    = "800m"
           }
         }
       }
       zookeeper = {
-        replicas = 2
+        replicas = 3
         storage = {
           type        = "persistent-claim"
           size        = "10Gi"
           deleteClaim = false
-          class       = "gp2"
+          class       = "ebs-sc"
         }
         resources = {
           requests = {
-            memory = "512Mi"
-            cpu    = "250m"
+            memory = "384Mi"
+            cpu    = "200m"
           }
           limits = {
-            memory = "1Gi"
-            cpu    = "500m"
+            memory = "768Mi"
+            cpu    = "400m"
           }
         }
       }
@@ -110,8 +110,8 @@ resource "kubernetes_manifest" "raw_financial_updates_topic" {
       }
     }
     spec = {
-      partitions = 2
-      replicas   = 2
+      partitions = 3
+      replicas   = 3
       config = {
         "retention.ms"  = 604800000
         "segment.bytes" = 1073741824
@@ -134,8 +134,8 @@ resource "kubernetes_manifest" "minute_aggregated_financial_updates_topic" {
       }
     }
     spec = {
-      partitions = 2
-      replicas   = 2
+      partitions = 3
+      replicas   = 3
       config = {
         "retention.ms"  = 604800000
         "segment.bytes" = 1073741824

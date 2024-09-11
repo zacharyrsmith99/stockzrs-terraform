@@ -86,6 +86,11 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_on
   role       = aws_iam_role.nodes_general.name
 }
 
+resource "aws_iam_role_policy_attachment" "nodes_ebs_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  role       = aws_iam_role.nodes_general.name
+}
+
 resource "aws_eks_node_group" "general" {
   cluster_name    = aws_eks_cluster.eks.name
   version         = "1.30"
@@ -142,8 +147,8 @@ resource "aws_eks_node_group" "kafka" {
   instance_types = ["t3.small"]
   scaling_config {
     desired_size = 3
-    max_size     = 3
-    min_size     = 2
+    max_size     = 8
+    min_size     = 3
   }
 
   update_config {
