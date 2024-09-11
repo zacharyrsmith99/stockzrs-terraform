@@ -20,6 +20,13 @@ module "services" {
   stockzrs_frontend_port   = var.stockzrs_frontend_port
   stockzrs_relay_port      = var.stockzrs_relay_port
   kafka_bootstrap_server   = module.eks.kafka_bootstrap_server
+  kafka_topics             = module.eks.kafka_topics
+  kafka_users              = module.eks.kafka_users
+  db_host                  = module.rds.db_host
+  db_name                  = module.rds.db_name
+  db_port                  = module.rds.db_port
+  db_admin_username        = module.rds.db_admin_username
+  db_admin_password        = module.rds.db_admin_password
 }
 
 module "openvpn" {

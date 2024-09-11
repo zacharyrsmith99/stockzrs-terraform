@@ -23,3 +23,15 @@ variable "stockzrs_relay_port" {}
 
 variable "kafka_bootstrap_server" {}
 
+variable "kafka_topics" {}
+
+variable "kafka_users" {}
+
+## db #####################
+variable "db_host" {}
+variable "db_name" {}
+variable "db_port" {}
+variable "db_admin_username" {}
+variable "db_admin_password" {}
+########################
+

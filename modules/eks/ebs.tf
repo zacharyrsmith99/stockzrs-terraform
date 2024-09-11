@@ -43,12 +43,12 @@ resource "kubernetes_storage_class" "ebs_sc" {
     }
   }
 
-  storage_provisioner = "ebs.csi.aws.com"
-  volume_binding_mode = "WaitForFirstConsumer"
+  storage_provisioner    = "ebs.csi.aws.com"
+  volume_binding_mode    = "WaitForFirstConsumer"
   allow_volume_expansion = true
 
   parameters = {
-    type = "gp3"
+    type      = "gp3"
     encrypted = "true"
   }
 

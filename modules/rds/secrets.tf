@@ -8,7 +8,6 @@ resource "aws_secretsmanager_secret_version" "stockzrs_postgres_config" {
     ENDPOINT       = aws_db_instance.stockzrs_db.endpoint
     DB_NAME        = aws_db_instance.stockzrs_db.db_name
     PORT           = aws_db_instance.stockzrs_db.port
-    DOMAIN         = aws_db_instance.stockzrs_db.domain
     ADMIN_USERNAME = aws_db_instance.stockzrs_db.username
     ADMIN_PASSWORD = random_password.stockzrs_postgres_db_password.result
   })

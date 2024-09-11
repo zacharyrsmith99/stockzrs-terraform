@@ -31,6 +31,18 @@ resource "kubernetes_namespace" "stockzrs_financial_aggregator_service" {
   depends_on = [aws_eks_cluster.eks]
 }
 
+resource "kubernetes_namespace" "stockzrs_data_persistence_service" {
+  metadata {
+    name = "stockzrs-data-persistence-service"
+    labels = {
+      name        = "stockzrs-data-persistence-service"
+      environment = "production"
+    }
+  }
+  depends_on = [aws_eks_cluster.eks]
+}
+
+
 resource "kubernetes_manifest" "github_actions_cluster_role" {
   manifest = yamldecode(file("${path.module}/k8s/cluster-roles/github-actions-cluster-role.yaml"))
 

@@ -1,3 +1,13 @@
+# resource "kubernetes_namespace" "delete_kafka" {
+#   metadata {
+#     name = "kafka"
+#   }
+
+#   lifecycle {
+#     create_before_destroy = false
+#   }
+# }
+
 resource "kubernetes_namespace" "kafka" {
   metadata {
     name = "kafka"
@@ -21,81 +31,91 @@ resource "kubernetes_manifest" "kafka_cluster" {
     metadata = {
       name      = "stockzrs-kafka-cluster"
       namespace = kubernetes_namespace.kafka.metadata[0].name
+      annotations = {
+        "strimzi.io/node-pools" = "enabled"
+        "strimzi.io/kraft"      = "enabled"
+      }
     }
     spec = {
       kafka = {
         version  = "3.8.0"
         replicas = 3
+        config = {
+          "offsets.topic.replication.factor"         = 3
+          "transaction.state.log.replication.factor" = 3
+          "transaction.state.log.min.isr"            = 2
+          "default.replication.factor"               = 3
+          "min.insync.replicas"                      = 2
+          "num.partitions"                           = 3
+        }
+        # authorization = {
+        #   type = "simple"
+        # }
         listeners = [
           {
             name = "plain"
             port = 9092
             type = "internal"
             tls  = false
+            # authentication = {
+            #   type = "scram-sha-512"
+            # }
           },
           {
             name = "tls"
             port = 9093
             type = "internal"
             tls  = true
+            authentication = {
+              type = "scram-sha-512"
+            }
           }
         ]
-        config = {
-          "offsets.topic.replication.factor"         = 3
-          "transaction.state.log.replication.factor" = 3
-          "transaction.state.log.min.isr"            = 3
-          "default.replication.factor"               = 3
-          "min.insync.replicas"                      = 3
-        }
-        storage = {
-          type = "jbod"
-          volumes = [
-            {
-              id          = 0
-              type        = "persistent-claim"
-              size        = "20Gi"
-              deleteClaim = false
-              class       = "ebs-sc"
-            }
-          ]
-        }
-        resources = {
-          requests = {
-            memory = "768Mi"
-            cpu    = "400m"
-          }
-          limits = {
-            memory = "1536Mi"
-            cpu    = "800m"
-          }
-        }
-      }
-      zookeeper = {
-        replicas = 3
-        storage = {
-          type        = "persistent-claim"
-          size        = "10Gi"
-          deleteClaim = false
-          class       = "ebs-sc"
-        }
-        resources = {
-          requests = {
-            memory = "384Mi"
-            cpu    = "200m"
-          }
-          limits = {
-            memory = "768Mi"
-            cpu    = "400m"
-          }
-        }
-      }
-      entityOperator = {
-        topicOperator = {}
-        userOperator  = {}
       }
     }
   }
   depends_on = [helm_release.kafka_operator]
+}
+
+resource "kubernetes_manifest" "kafka_nodepool_combined" {
+  manifest = {
+    apiVersion = "kafka.strimzi.io/v1beta2"
+    kind       = "KafkaNodePool"
+    metadata = {
+      name      = "dual-role"
+      namespace = kubernetes_namespace.kafka.metadata[0].name
+      labels = {
+        "strimzi.io/cluster" = "stockzrs-kafka-cluster"
+      }
+    }
+    spec = {
+      replicas = 3
+      roles    = ["controller", "broker"]
+      storage = {
+        type = "jbod"
+        volumes = [
+          {
+            id          = 0
+            type        = "persistent-claim"
+            size        = "10Gi"
+            deleteClaim = false
+            class       = "ebs-sc"
+          }
+        ]
+      }
+      resources = {
+        requests = {
+          memory = "512Mi"
+          cpu    = "250m"
+        }
+        limits = {
+          memory = "1400Mi"
+          cpu    = "1000m"
+        }
+      }
+    }
+  }
+  depends_on = [kubernetes_manifest.kafka_cluster]
 }
 
 resource "kubernetes_manifest" "raw_financial_updates_topic" {
@@ -103,7 +123,7 @@ resource "kubernetes_manifest" "raw_financial_updates_topic" {
     apiVersion = "kafka.strimzi.io/v1beta2"
     kind       = "KafkaTopic"
     metadata = {
-      name      = "raw-financial-updates"
+      name      = var.kafka_raw_financial_updates_topic
       namespace = "kafka"
       labels = {
         "strimzi.io/cluster" = "stockzrs-kafka-cluster"
@@ -111,14 +131,13 @@ resource "kubernetes_manifest" "raw_financial_updates_topic" {
     }
     spec = {
       partitions = 3
-      replicas   = 3
+      replicas   = 2
       config = {
-        "retention.ms"  = 604800000
+        "retention.ms"  = 104800000
         "segment.bytes" = 1073741824
       }
     }
   }
-
   depends_on = [kubernetes_manifest.kafka_cluster]
 }
 
@@ -127,7 +146,7 @@ resource "kubernetes_manifest" "minute_aggregated_financial_updates_topic" {
     apiVersion = "kafka.strimzi.io/v1beta2"
     kind       = "KafkaTopic"
     metadata = {
-      name      = "minute-aggregated-financial-updates"
+      name      = var.kafka_minute_aggregates_topic
       namespace = "kafka"
       labels = {
         "strimzi.io/cluster" = "stockzrs-kafka-cluster"
@@ -135,14 +154,13 @@ resource "kubernetes_manifest" "minute_aggregated_financial_updates_topic" {
     }
     spec = {
       partitions = 3
-      replicas   = 3
+      replicas   = 2
       config = {
-        "retention.ms"  = 604800000
+        "retention.ms"  = 304800000
         "segment.bytes" = 1073741824
       }
     }
   }
-
   depends_on = [kubernetes_manifest.kafka_cluster]
 }
 

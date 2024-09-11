@@ -25,4 +25,13 @@ resource "aws_ecr_repository" "stockzrs_financial_aggregator_service_repository"
   }
 }
 
+resource "aws_ecr_repository" "stockzrs_data_persistence_service_repository" {
+  name                 = "stockzrs-data-persistence-service-repository"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
 

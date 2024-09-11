@@ -15,3 +15,12 @@ resource "kubernetes_secret" "stockzrs_financial_aggregator_service_secrets" {
 
   data = var.stockzrs_secrets_configs.stockzrs_financial_aggregator_service.secret_string
 }
+
+resource "kubernetes_secret" "stockzrs_data_persistence_service_secrets" {
+  metadata {
+    name      = "stockzrs-data-persistence-secrets"
+    namespace = "stockzrs-data-persistence-service"
+  }
+
+  data = var.stockzrs_secrets_configs.stockzrs_data_persistence_service.secret_string
+}
