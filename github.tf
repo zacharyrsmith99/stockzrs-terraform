@@ -17,7 +17,8 @@ resource "aws_iam_role" "github_actions" {
               "repo:zacharyrsmith99/stockzrs-relay-service:*",
               "repo:zacharyrsmith99/stockzrs-frontend:*",
               "repo:zacharyrsmith99/stockzrs-financial-aggregator-service:*",
-              "repo:zacharyrsmith99/stockzrs-data-persistence-service:*"
+              "repo:zacharyrsmith99/stockzrs-data-persistence-service:*",
+              "repo:zacharyrsmith99/stockzrs-metrics-service:*"
             ]
           }
         }
@@ -222,6 +223,23 @@ resource "github_actions_secret" "stockzrs_data_persistence_service_ecr_reposito
   repository      = var.stockzrs_data_persistence_service_github_repository
   secret_name     = "ECR_REPOSITORY_URL"
   plaintext_value = module.services.ecr_repositories.stockzrs_data_persistence_service.url
+}
+
+####################################
+####################################
+
+####################################
+####################################STOCKZRS DATA PERSISTENCE SERVICE GITHUB SECRETS
+
+resource "github_actions_secret" "stockzrs_metrics_service_ecr_repository_name" {
+  repository      = var.stockzrs_metrics_service_github_repository
+  secret_name     = "ECR_REPOSITORY_NAME"
+  plaintext_value = module.services.ecr_repositories.stockzrs_metrics_service.name
+}
+resource "github_actions_secret" "stockzrs_metrics_service_ecr_repository_url" {
+  repository      = var.stockzrs_metrics_service_github_repository
+  secret_name     = "ECR_REPOSITORY_URL"
+  plaintext_value = module.services.ecr_repositories.stockzrs_metrics_service.url
 }
 
 ####################################

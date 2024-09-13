@@ -16,6 +16,10 @@ output "ecr_repositories" {
       name = aws_ecr_repository.stockzrs_data_persistence_service_repository.name
       url  = aws_ecr_repository.stockzrs_data_persistence_service_repository.repository_url
     }
+    stockzrs_metrics_service = {
+      name = aws_ecr_repository.stockzrs_metrics_service_repository.name
+      url  = aws_ecr_repository.stockzrs_metrics_service_repository.repository_url
+    }
   }
   description = "ECR repository details for Stockzrs services"
 }
@@ -41,6 +45,10 @@ output "stockzrs_secrets_configs" {
     stockzrs_data_persistence_service = {
       arn           = aws_secretsmanager_secret.stockzrs_data_persistence_service_config.arn
       secret_string = jsondecode(aws_secretsmanager_secret_version.stockzrs_data_persistence_service_config.secret_string)
+    }
+    stockzrs_metrics_service = {
+      arn           = aws_secretsmanager_secret.stockzrs_metrics_service_config.arn
+      secret_string = jsondecode(aws_secretsmanager_secret_version.stockzrs_metrics_service_config.secret_string)
     }
   }
   sensitive = true

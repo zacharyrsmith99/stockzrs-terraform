@@ -35,3 +35,5 @@ variable "db_admin_username" {}
 variable "db_admin_password" {}
 ########################
 
+variable "stockzrs_metrics_service_port" {}
+

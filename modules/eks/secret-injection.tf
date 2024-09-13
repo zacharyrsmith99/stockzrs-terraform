@@ -24,3 +24,12 @@ resource "kubernetes_secret" "stockzrs_data_persistence_service_secrets" {
 
   data = var.stockzrs_secrets_configs.stockzrs_data_persistence_service.secret_string
 }
+
+resource "kubernetes_secret" "stockzrs_metrics_service_secrets" {
+  metadata {
+    name      = "stockzrs-metrics-secrets"
+    namespace = "stockzrs-metrics-service"
+  }
+
+  data = var.stockzrs_secrets_configs.stockzrs_metrics_service.secret_string
+}

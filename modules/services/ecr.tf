@@ -34,4 +34,13 @@ resource "aws_ecr_repository" "stockzrs_data_persistence_service_repository" {
   }
 }
 
+resource "aws_ecr_repository" "stockzrs_metrics_service_repository" {
+  name                 = "stockzrs-metrics-service-repository"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
 

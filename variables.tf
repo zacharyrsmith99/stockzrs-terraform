@@ -14,10 +14,25 @@ variable "stockzrs_data_persistence_service_github_repository" {
   default = "stockzrs-data-persistence-service"
 }
 
+variable "stockzrs_metrics_service_github_repository" {
+  default = "stockzrs-metrics-service"
+}
+
 variable "github_repositories_with_common_secrets" {
   type        = list(string)
   description = "List of GitHub repositories to set secrets for"
-  default     = ["stockzrs-relay-service", "stockzrs-frontend", "stockzrs-financial-aggregator-service", "stockzrs-data-persistence-service"]
+  default = [
+    "stockzrs-relay-service",
+    "stockzrs-frontend",
+    "stockzrs-financial-aggregator-service",
+    "stockzrs-data-persistence-service",
+    "stockzrs-metrics-service"
+  ]
+}
+
+variable "stockzrs_metrics_service_port" {
+  type    = number
+  default = 3000
 }
 
 variable "stockzrs_frontend_port" {
