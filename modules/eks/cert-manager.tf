@@ -74,3 +74,33 @@ resource "kubernetes_manifest" "cluster_issuer_stockzrs_frontend" {
   }
   depends_on = [helm_release.cert_manager]
 }
+
+resource "kubernetes_manifest" "cluster_issuer_stockzrs_metrics_service" {
+  manifest = {
+    apiVersion = "cert-manager.io/v1"
+    kind       = "ClusterIssuer"
+    metadata = {
+      name = "stockzrs-metrics-service"
+    }
+    spec = {
+      acme = {
+        email  = "zachary.r.smith99@gmail.com"
+        server = "https://acme-v02.api.letsencrypt.org/directory"
+        privateKeySecretRef = {
+          name = "stockzrs-metrics-service-cluster-issuer"
+        }
+        solvers = [
+          {
+            http01 = {
+              ingress = {
+                ingressClassName = "external-nginx"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  depends_on = [helm_release.cert_manager]
+}

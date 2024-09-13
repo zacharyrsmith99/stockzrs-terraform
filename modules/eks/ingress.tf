@@ -136,3 +136,43 @@ resource "kubernetes_ingress_v1" "stockzrs_frontend_ingress" {
     }
   }
 }
+
+resource "kubernetes_ingress_v1" "stockzrs_metrics_service_ingress" {
+  depends_on = [aws_eks_cluster.eks]
+  metadata {
+    name      = "stockzrs-metrics-service"
+    namespace = "stockzrs-metrics-service"
+    annotations = {
+      "kubernetes.io/ingress.class"                       = "external-nginx"
+      "cert-manager.io/cluster-issuer"                    = "stockzrs-metrics-service"
+      "nginx.ingress.kubernetes.io/proxy-read-timeout"    = "3600"
+      "nginx.ingress.kubernetes.io/proxy-send-timeout"    = "3600"
+      "nginx.ingress.kubernetes.io/proxy-connect-timeout" = "3600"
+      "nginx.ingress.kubernetes.io/proxy-http-version"    = "1.1"
+    }
+  }
+  spec {
+    ingress_class_name = "external-nginx"
+    tls {
+      hosts       = ["stockzrs-metrics-service.stockzrs.com"]
+      secret_name = "stockzrs-metrics-service-tls"
+    }
+    rule {
+      host = "stockzrs-metrics-service.stockzrs.com"
+      http {
+        path {
+          path      = "/"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = "stockzrs-metrics-service"
+              port {
+                number = 80
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

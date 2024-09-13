@@ -31,8 +31,8 @@ resource "aws_secretsmanager_secret_version" "stockzrs_frontend_config" {
     LOG_LEVEL                     = "info"
     ENVIRONMENT                   = "production"
     PORT                          = tostring(var.stockzrs_frontend_port)
-    STOCKZRS_RELAY_SERVICE_WS_URL = var.stockzrs_relay_service_ws_url
-    STOCKZRS_METRICS_SERVICE_URL = "stockzrs-metrics-service.stockzrs-metrics-service.svc.cluster.local"
+    VITE_STOCKZRS_RELAY_SERVICE_WS_URL = var.stockzrs_relay_service_ws_url
+    VITE_STOCKZRS_METRICS_SERVICE_URL = "stockzrs-metrics-service.stockzrs.com"
   })
 }
 
@@ -93,7 +93,7 @@ resource "aws_secretsmanager_secret" "stockzrs_metrics_service_config" {
 resource "aws_secretsmanager_secret_version" "stockzrs_metrics_service_config" {
   secret_id = aws_secretsmanager_secret.stockzrs_metrics_service_config.id
   secret_string = jsonencode({
-    PORT              = var.stockzrs_metrics_service_port
+    METRICS_SERVICE_PORT              = var.stockzrs_metrics_service_port
     LOG_LEVEL         = "info"
     ENVIRONMENT       = "production"
     POSTGRES_HOST     = var.db_host
